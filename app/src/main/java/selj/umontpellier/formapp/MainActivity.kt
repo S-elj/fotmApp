@@ -132,6 +132,7 @@ fun DomaineActiviteSelection(
                     onClick = {
                         onDomaineSelected(domaine)
                         expanded = false
+
                     },
                 )
             }
