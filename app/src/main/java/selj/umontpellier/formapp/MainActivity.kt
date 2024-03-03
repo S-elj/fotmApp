@@ -1,5 +1,7 @@
 package selj.umontpellier.formapp
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -16,8 +18,10 @@ import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat.startActivity
 
 import selj.umontpellier.formapp.ui.theme.FormAppTheme
 
@@ -39,12 +43,44 @@ fun MyApp() {
         var domaineActivite by remember { mutableStateOf("") }
         var showConfirmationDialog by remember { mutableStateOf(false) }
 
+        val context = LocalContext.current
+
+
+        fun showDisplayInfoActivity(
+            context: Context,
+            nom: String,
+            prenom: String,
+            telephone: String,
+            domaineActivite: String
+        ) {
+            val intent = Intent(context, DisplayInfoActivity::class.java).apply {
+                putExtra("NOM", nom)
+                putExtra("PRENOM", prenom)
+                putExtra("TELEPHONE", telephone)
+                putExtra("DOMAINE_ACTIVITE", domaineActivite)
+            }
+            context.startActivity(intent)
+        }
+
+
         Column(modifier = Modifier.padding(16.dp)) {
             NomTextField(nom, onValueChange = { nom = it; println("appel a nom()") })
             PrenomTextField(prenom, onValueChange = { prenom = it })
             TelephoneTextField(telephone, onValueChange = { telephone = it })
             DomaineActiviteSelection(
-                domainesActivite = listOf("Domaine 1", "Domaine 2", "Domaine 3"),
+                domainesActivite = listOf(
+                    "Agroalimentaire",
+                    "Banque / Assurance",
+                    "Bois / Papier / Carton / Imprimerie",
+                    "BTP / Matériaux de construction",
+                    "Chimie / Parachimie",
+                    "Commerce / Négoce / Distribution",
+                    "Édition / Communication / Multimédia",
+                    "Électronique / Électricité",
+                    "Études et conseils",
+                    "Industrie pharmaceutique",
+                    "Informatique / Télécoms"
+                ),
                 selectedDomaine = domaineActivite,
                 onDomaineSelected = { domaineActivite = it }
             )
@@ -53,7 +89,7 @@ fun MyApp() {
             if (showConfirmationDialog) {
                 ConfirmationDialog(
                     onConfirm = {
-                        // Logique de confirmation ici
+                        showDisplayInfoActivity(context, nom, prenom, telephone, domaineActivite)
                         showConfirmationDialog = false
                     },
                     onDismiss = { showConfirmationDialog = false }
@@ -112,6 +148,7 @@ fun DomaineActiviteSelection(
             value = selectedDomaine,
             onValueChange = { /* Lecture seule */ },
             readOnly = true,
+            enabled = false,
             label = { Text("Domaine d'Activité") },
             trailingIcon = {
                 Icon(
